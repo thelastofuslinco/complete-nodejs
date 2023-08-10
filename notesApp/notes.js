@@ -23,6 +23,7 @@ const getNotes = (title) => {
   if (title) {
     const note = notes.find((note) => note.title === title)
     note && print(note.title, 'blue')
+    note && print(note.body, 'red')
     !note && print('Note not found!', 'red')
   } else {
     notes.forEach((note) => {
