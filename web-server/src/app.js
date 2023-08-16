@@ -38,8 +38,20 @@ app.get('/help', (req, res) => {
   })
 })
 
-app.get('/weather', (req, res) => {
-  res.send('weather')
+app.get('/help/*', (req, res) => {
+  res.render('404', {
+    title: 'Help page',
+    errorMessage: 'this article not exists!',
+    author: 'Lincoln Duarte'
+  })
+})
+
+app.get('*', (req, res) => {
+  res.render('404', {
+    title: '404',
+    author: 'Lincoln Duarte',
+    errorMessage: 'Page not found.'
+  })
 })
 
 app.listen(3000, (listen) => {
