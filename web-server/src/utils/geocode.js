@@ -1,5 +1,5 @@
 const request = require('postman-request')
-const config = require('../../config')
+const config = require('../../../config')
 
 const key = config.geocodeKey
 const limit = 1
@@ -12,7 +12,7 @@ const geocode = (location, callback) => {
 
     if (error) {
       callback('Unable to connect to position service', null)
-    } else if (data.data.length === 0) {
+    } else if (data.error) {
       callback('Unable to find location', null)
     } else {
       callback(null, data.data[0])
