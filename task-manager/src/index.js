@@ -10,14 +10,23 @@ app.use(express.json())
 
 // User route
 app.get('/users', (req, res) => {
-  res.send('get user')
+  UserModel.find()
+    .then((users) => res.send(users))
+    .catch(() => res.status(500).send())
 })
 
 app.get('/users/:id', (req, res) => {
   const { id } = req.params
-  console.log(id)
 
-  res.send('get user by id')
+  UserModel.findById(id)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: 'User not found!' })
+      }
+
+      res.send(user)
+    })
+    .catch((error) => res.status(500).send(error))
 })
 
 app.post('/users', (req, res) => {
@@ -45,14 +54,23 @@ app.patch('/users/:id', (req, res) => {
 
 // Task route
 app.get('/tasks', (req, res) => {
-  res.send('get user')
+  TaskModel.find()
+    .then((tasks) => res.send(tasks))
+    .catch(() => res.status(500).send())
 })
 
 app.get('/tasks/:id', (req, res) => {
   const { id } = req.params
-  console.log(id)
 
-  res.send('get tasks by id')
+  TaskModel.findById(id)
+    .then((task) => {
+      if (!task) {
+        return res.status(404).send({ message: 'Task not found!' })
+      }
+
+      res.send(task)
+    })
+    .catch((error) => res.status(500).send(error))
 })
 
 app.post('/tasks', (req, res) => {
