@@ -1,5 +1,5 @@
-const UserModel = require('../models/user')
 const express = require('express')
+const UserModel = require('../models/user')
 const router = express.Router()
 
 router.get('/users', async (req, res) => {
@@ -29,13 +29,14 @@ router.get('/users/:id', async (req, res) => {
 })
 
 router.post('/users', async (req, res) => {
-  const userDoc = new UserModel(req.body)
+  const user = new UserModel(req.body)
 
   try {
-    await userDoc.save()
-    res.status(201).send(userDoc)
+    await user.save()
+    const token = await user.generateAuthToken()
+    res.status(201).send({ user, token })
   } catch (error) {
-    es.status(400).send(error)
+    res.status(400).send(error)
   }
 })
 
@@ -64,14 +65,14 @@ router.patch('/users/:id', async (req, res) => {
   )
 
   if (!isValidUpdate) {
-    return res.status(404).send({ message: 'Update not allowed!' })
+    return res.status(400).send({ message: 'Update not allowed!' })
   }
 
   try {
-    const user = await UserModel.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true
-    })
+    const user = await UserModel.findById(id)
+
+    updates.forEach((update) => (user[update] = req.body[update]))
+    await user.save()
 
     if (!user) {
       return res.status(404).send({ message: 'User not found!' })
