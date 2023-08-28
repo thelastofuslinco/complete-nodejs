@@ -5,36 +5,39 @@ const jwt = require('jsonwebtoken')
 const TaskModel = require('./task')
 
 const { Schema } = mongoose
-const userSchema = new Schema({
-  name: {
-    type: String,
-    trim: true,
-    required: true
+const userSchema = new Schema(
+  {
+    name: {
+      type: String,
+      trim: true,
+      required: true
+    },
+    age: {
+      type: Number,
+      default: 0,
+      validate(value) {
+        if (Number(value) < 0) throw Error('Age must be a positive number')
+      }
+    },
+    email: {
+      type: String,
+      unique: true,
+      trim: true,
+      required: true,
+      validate(value) {
+        if (!validator.isEmail(value)) throw Error('Email is invalid')
+      }
+    },
+    password: {
+      type: String,
+      trim: true,
+      required: true,
+      minlength: 8
+    },
+    tokens: [{ token: { type: String, required: true } }]
   },
-  age: {
-    type: Number,
-    default: 0,
-    validate(value) {
-      if (Number(value) < 0) throw Error('Age must be a positive number')
-    }
-  },
-  email: {
-    type: String,
-    unique: true,
-    trim: true,
-    required: true,
-    validate(value) {
-      if (!validator.isEmail(value)) throw Error('Email is invalid')
-    }
-  },
-  password: {
-    type: String,
-    trim: true,
-    required: true,
-    minlength: 8
-  },
-  tokens: [{ token: { type: String, required: true } }]
-})
+  { timestamps: true }
+)
 
 userSchema.virtual('tasks', {
   ref: 'Task',
