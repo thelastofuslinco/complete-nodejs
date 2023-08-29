@@ -4,9 +4,21 @@ const auth = require('../middlewares/auth')
 const router = express.Router()
 
 router.get('/tasks', auth, async (req, res) => {
+  const { limit, skip, completed, sortBy } = req.query
+  const query = { owner: req.user._id }
+  const options = { limit, skip }
+  const sort = {}
+
+  if (completed) query.completed = completed
+  if (sortBy) {
+    const parts = sortBy.split(':')
+    sort[parts[0]] = parts[1] === 'desc' ? -1 : 1
+  }
+
   try {
-    const tasks = await TaskModel.find({ owner: req.user._id })
-    res.send(tasks)
+    const data = await TaskModel.find(query).setOptions({ ...options, sort })
+
+    res.send({ data })
   } catch (error) {
     res.status(500).send()
   }
