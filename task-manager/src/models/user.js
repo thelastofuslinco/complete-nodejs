@@ -34,6 +34,9 @@ const userSchema = new Schema(
       required: true,
       minlength: 8
     },
+    avatar: {
+      type: Buffer
+    },
     tokens: [{ token: { type: String, required: true } }]
   },
   { timestamps: true }
@@ -49,6 +52,7 @@ userSchema.method('toJSON', function () {
   const newUser = this.toObject()
   delete newUser.password
   delete newUser.tokens
+  delete newUser.avatar
 
   return newUser
 })
