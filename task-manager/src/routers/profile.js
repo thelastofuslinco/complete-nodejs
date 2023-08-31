@@ -3,6 +3,7 @@ const multer = require('multer')
 const sharp = require('sharp')
 const auth = require('../middlewares/auth')
 const UserModel = require('../models/user')
+const { sendCancelationEmail } = require('../emails/accounts')
 
 const router = express.Router()
 const upload = multer({
@@ -25,7 +26,7 @@ router.get('/profile', auth, async (req, res) => {
 router.delete('/profile', auth, async (req, res) => {
   try {
     await req.user.deleteOne()
-
+    sendCancelationEmail(req.user.email, req.user.name)
     res.send(req.user)
   } catch (error) {
     res.status(500).send(error)
