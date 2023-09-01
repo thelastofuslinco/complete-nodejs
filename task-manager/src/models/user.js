@@ -83,9 +83,8 @@ userSchema.statics.findByCredentials = async (email, password) => {
 }
 
 userSchema.pre('deleteOne', { document: true }, async function (next) {
-  console.log('before', this)
   await TaskModel.deleteMany({ owner: this._id })
-  console.log('after', this)
+
   next()
 })
 
