@@ -1,7 +1,5 @@
 const request = require('postman-request')
-const config = require('../../config')
-
-const key = config.weatherKey
+const key = process.env.WEATHER_KEY
 const limit = 1
 
 const weather = (location, callback) => {

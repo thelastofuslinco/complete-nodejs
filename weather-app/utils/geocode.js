@@ -1,7 +1,5 @@
 const request = require('postman-request')
-const config = require('../../config')
-
-const key = config.geocodeKey
+const key = process.env.GEOCODE_KEY
 const limit = 1
 
 const geocode = (location, callback) => {
