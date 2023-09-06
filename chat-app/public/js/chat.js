@@ -1,4 +1,4 @@
-const socket = io(`ws://localhost:${process.env.PORT}`)
+const socket = io()
 
 const $form = document.getElementById('message_form')
 const $messages = document.getElementById('messages')
