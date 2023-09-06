@@ -2,9 +2,10 @@ const generateMessage = (username, text) => {
   return {
     username,
     text,
-    createdAt: new Date().toLocaleTimeString('es-US', {
+    createdAt: new Date().toLocaleTimeString('pt-BR', {
       hour: 'numeric',
-      minute: '2-digit'
+      minute: '2-digit',
+      timeZone: 'America/Sao_Paulo'
     })
   }
 }
