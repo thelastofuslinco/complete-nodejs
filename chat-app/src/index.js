@@ -2,7 +2,8 @@ const path = require('path')
 const express = require('express')
 const { createServer } = require('http')
 const { Server } = require('socket.io')
-const Message = require('./models/message')
+const { generateMessage } = require('./utils/message')
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/user')
 
 const app = express()
 const httpServer = createServer(app)
@@ -13,27 +14,53 @@ const publicDirPath = path.join(__dirname, '../public')
 
 app.use(express.static(publicDirPath))
 
-const messages = new Array()
-
 io.on('connection', (socket) => {
-  socket.emit(
-    'welcome',
-    messages.map((message) => message.getMessage())
-  )
+  socket.on('join', (options, callback) => {
+    const { error, user } = addUser({ id: socket.id, ...options })
 
-  socket.broadcast.emit(
-    'message',
-    new Message('A new user has joined!').getMessage()
-  )
+    if (error) {
+      return callback(error)
+    }
+
+    socket.join(user.room)
+
+    socket.emit('message', generateMessage('Server', 'welcome'))
+
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        'message',
+        generateMessage('Server', `${user.username} has joined!`)
+      )
+
+    io.to(user.room).emit('roomData', {
+      room: user.room,
+      users: getUsersInRoom(user.room)
+    })
+
+    callback()
+  })
 
   socket.on('send_message', (message, callback) => {
-    messages.push(new Message(message))
-    io.emit('message', new Message(message).getMessage())
+    const user = getUser(socket.id)
+    io.to(user.room).emit('message', generateMessage(user.username, message))
     callback()
   })
 
   socket.on('disconnect', () => {
-    io.emit('message', new Message('A user has left!').getMessage())
+    const user = removeUser(socket.id)
+
+    if (user) {
+      io.to(user.room).emit(
+        'message',
+        generateMessage('Server', `${user.username} has left!`)
+      )
+
+      io.to(user.room).emit('roomData', {
+        room: user.room,
+        users: getUsersInRoom(user.room)
+      })
+    }
   })
 })
 
